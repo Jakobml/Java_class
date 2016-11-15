@@ -11,7 +11,7 @@ public class Database {
     private static Database instance = null;
 
     private Database(){
-        this.highScoreList = new HighScoreList();
+        this.addressList = new ArrayList<>();
     }
 
     public static Database getInstance(){
@@ -21,32 +21,36 @@ public class Database {
         return instance;
     }
 
-    private HighScoreList highScoreList;
+    private List<Address> addressList;
 
-    public List<HighScorePost> saveHighScore(int level, HighScorePost highScorePost){
-
-
-        List<HighScorePost> highScores;
-        if(this.highScoreList.getHighScorePosts().containsKey(level)){
-            highScores = this.highScoreList.getHighScorePosts().get(level);
-        }else{
-            highScores = new ArrayList<>();
+    public Address saveAddress(Address address){
+        if (address.getId() > 0) {
+            addressList.remove(address);
+        } else {
+            address.setId(getNextAddressId());
         }
-        highScores.add(highScorePost);
-        this.highScoreList.getHighScorePosts().put(level, highScores);
-        return highScores;
+        addressList.add(address);
+
+        return address;
+
+    }
+    private int getNextAddressId() {
+        return addressList.size() + 1;
     }
 
-    public List<HighScorePost> getHighScore(int level, int numberOfPosts){
-        List<HighScorePost> highScores = this.highScoreList.getHighScorePosts().get(level);
-        if(highScores == null){
-            return new ArrayList<>();
+    public List<Address> findAll() {
+        return addressList;
+    }
+    public Address findOne(int id) {
+        for (Address address : addressList) {
+            if (id == address.getId()) {
+                return address;
+            }
         }
-        Collections.sort(highScores);
-        if(highScores.size()<= numberOfPosts){
-            return highScores;
-        }
-
-        return highScores.subList(0, numberOfPosts);
+        return new Address();
+    }
+    public void deleteAddress(int id) {
+        Address address = findOne(id);
+        addressList.remove(address);
     }
 }
